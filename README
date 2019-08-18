@@ -1,0 +1,50 @@
+cl-pledge - interface to the OpenBSD pledge/unveil system calls
+
+install for ASDF, e.g.
+
+    mkdir -p "$HOME"/.local/share/common-lisp/source
+    cd "$HOME"/.local/share/common-lisp/source
+    git clone ...
+
+this also requires CFFI (and its depedencies) to be available
+
+consult the pledge(2) and unveil(2) documentation as this package is a
+fairly thin wrapper around those calls. on internal failure, the entire
+LISP process will be exited using err(3) '(this is not very LISP-like).
+on invalid input ERROR will be raised
+
+NOTE - SBCL generates very large core files when pledge fails; these may
+need to be limited or disabled to spare the disk from needless I/O.
+Common LISP implementations beyond SBCL have not been tested
+
+Pledge Example
+
+    (require :asdf)
+    (asdf:load-system :cl-pledge)
+    (defpackage :mypkg (:use :cl :cl-pledge))
+    (in-package :mypkg)
+
+    (pledge :promises "prot_exec rpath stdio")
+
+    ; this should fail; raising permissions is not possible
+    ;(pledge :promises "prot_exec rpath stdio wpath")
+
+    ; this should also fail: {pledge "wpath", syscall 5} in the
+    ; /var/log/messages file (or also "cpath", probably)
+    (with-open-file (out "/tmp/foo" :direction :output :if-exists :supersede)
+        (princ 'bar out))
+
+Unveil Example
+
+    (require :asdf)
+    (asdf:load-system :cl-pledge)
+    (defpackage :mypkg (:use :cl :cl-pledge))
+    (in-package :mypkg)
+
+    (unveil "/" "r")
+    ; allow no subsequent changes (this differs from the C interface!)
+    (unveil-lockdown)
+
+    ; this should fail with "Permission denied" or similar
+    (with-open-file (out "/tmp/foo" :direction :output :if-exists :supersede)
+        (princ 'bar out))
