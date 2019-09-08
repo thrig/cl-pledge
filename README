@@ -48,3 +48,7 @@ Unveil Example
     ; this should fail with "Permission denied" or similar
     (with-open-file (out "/tmp/foo" :direction :output :if-exists :supersede)
         (princ 'bar out))
+
+See Also
+
+https://github.com/thrig/tcl-pledge
