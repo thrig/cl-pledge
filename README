@@ -6,7 +6,9 @@ install for ASDF, e.g.
     cd "$HOME"/.local/share/common-lisp/source
     git clone ...
 
-this also requires CFFI (and its depedencies) to be available
+this also requires CFFI (and its depedencies) to be available; another
+way would be to symlink this directory into ~/quicklisp/local-projects
+and then use Quicklisp instead of ASDF directly
 
 consult the pledge(2) and unveil(2) documentation as this package is a
 fairly thin wrapper around those calls. on internal failure, the entire
